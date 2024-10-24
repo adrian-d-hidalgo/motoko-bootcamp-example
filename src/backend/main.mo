@@ -1,11 +1,13 @@
 import Principal "mo:base/Principal";
+import Debug "mo:base/Debug";
+import Result "mo:base/Result";
 
 actor {
     stable var name: Text = "";
 
     type User = (Text, Nat);
 
-    var user: [User] = [
+    var users: [User] = [
         ("Adrián", 36),
         ("Manuel", 45)
     ];
@@ -22,9 +24,18 @@ actor {
         return msg.caller;
     };
 
-    public shared query ({caller}) func getUsers(): async [User] {
-        if(Principal.isAnonymous(caller)) { return [];};
+    type GetUsersResult = Result.Result<[User], Text>;
 
-        return user;
+    public shared query ({caller}) func getUsers(): async GetUsersResult {
+        Debug.print("Caller: " # Principal.toText(caller));
+
+        if(Principal.isAnonymous(caller)) {
+            Debug.print("Anonymous user");
+            return #err("You must be authenticated to get users");
+        };
+
+        Debug.print("Authenticated user");
+
+        return #ok(users);
     };
 }
