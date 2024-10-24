@@ -1,3 +1,5 @@
+import Principal "mo:base/Principal";
+
 actor {
     stable var name: Text = "";
 
@@ -14,5 +16,15 @@ actor {
 
     public query func getName() : async Text {
         return name;
+    };
+
+    public shared query (msg) func whoAmI(): async Principal {
+        return msg.caller;
+    };
+
+    public shared query ({caller}) func getUsers(): async [User] {
+        if(Principal.isAnonymous(caller)) { return [];};
+
+        return user;
     };
 }
